@@ -12,7 +12,7 @@ function main() {
     !validateArgs(argument) ||
     !file
   ) {
-    console.log("something went wrong, make sure you passed");
+    console.log("something went wrong, make sure you passed required arguments");
     return;
   }
 
