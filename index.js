@@ -3,21 +3,28 @@ import path from "path";
 
 function main() {
   const args = process.argv.slice(2);
-  const [command, argument, file] = args;
-
-  if (
-    !command ||
-    command !== "ccwc" ||
-    argument === "" ||
-    !validateArgs(argument) ||
-    !file
-  ) {
-    console.log("something went wrong, make sure you passed required arguments");
-    return;
+  let defaultArg;
+  if (args.length === 3) {
+    const [command, argument, file] = args;
+    if (validateInput(command, argument, file)) {
+      reader(argument, file);
+    } else {
+      console.log("Usage: node script.js ccwc [-c | -l | -w] <filename>");
+    }
+  } else {
+    const [command, file] = args;
+    defaultArg = "-all";
+    !command || !file
+      ? console.log("Usage: node script.js ccwc [-c | -l | -w] <filename>")
+      : reader(defaultArg, file);
   }
+}
 
-  // read file
-  reader(argument, file);
+function validateInput(command, argument, file) {
+  if (!command || command !== "ccwc" || !validateArgs(argument) || !file) {
+    return false;
+  }
+  return true;
 }
 
 function validateArgs(argument) {
@@ -48,6 +55,14 @@ function reader(argument, file) {
         words = words.length;
         console.log(words, myFile);
         break;
+      case "-all":
+        bytes = data.length;
+        lines = data.split("\n");
+        lines = lines.length;
+        words = data.split(/\s+/).filter(Boolean);
+        words = words.length;
+        console.log(bytes, lines, words, myFile);
+        break;
       default:
         console.log("No correct argument was passed, use -c, -l, -w");
         break;
@@ -64,3 +79,4 @@ function extractFileName(pathToFile) {
 }
 
 main();
+
