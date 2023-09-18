@@ -2,32 +2,56 @@ import { readFileSync } from "fs";
 import path from "path";
 
 function main() {
-  // get args
   const args = process.argv.slice(2);
-  const [command, file] = args;
+  const [command, argument, file] = args;
 
-  if (!command || command !== "ccwc" || !file) {
-    console.log("something went wrong");
+  if (
+    !command ||
+    command !== "ccwc" ||
+    argument === "" ||
+    !validateArgs(argument) ||
+    !file
+  ) {
+    console.log("something went wrong, make sure you passed");
     return;
   }
 
   // read file
-  reader(file);
+  reader(argument, file);
 }
 
-function reader(file) {
+function validateArgs(argument) {
+  if (argument !== "-c" || argument !== "-l" || argument !== "-w") {
+    return false;
+  }
+  return true;
+}
+
+function reader(argument, file) {
   try {
+    let bytes, lines, words;
     const data = readFileSync(file, "utf-8");
-    const lines = data.split("\n");
-    const numLines = lines.length;
-    const words = data.split(/\s+/).filter(Boolean);
-    const numWords = words.length;
-    const numChars = data.length;
+    const myFile = extractFileName(file);
 
-    const myFile = extractFileName(file); // check if file includes path
-    const output = `${numLines} ${numWords} ${numChars} ${myFile}`;
-
-    console.log(output);
+    switch (argument) {
+      case "-c":
+        bytes = data.length;
+        console.log(bytes, myFile);
+        break;
+      case "-l":
+        lines = data.split("\n");
+        lines = lines.length;
+        console.log(lines, myFile);
+        break;
+      case "-w":
+        words = data.split(/\s+/).filter(Boolean);
+        words = words.length;
+        console.log(words, myFile);
+        break;
+      default:
+        console.log("No correct argument was passed, use -c, -l, -w");
+        break;
+    }
   } catch (e) {}
 }
 
